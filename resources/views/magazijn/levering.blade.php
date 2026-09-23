@@ -23,6 +23,14 @@
                 </tr>
             </thead>
             <tbody>
+                @if ($geenVoorraad)
+                    <tr>
+                        <td colspan="4" class="jamin-melding">
+                            Er is van dit product op dit moment geen voorraad aanwezig, de verwachte eerstvolgende levering is:
+                            {{ $volgendeLevering ? date('d-m-Y', strtotime($volgendeLevering)) : 'onbekend' }}
+                        </td>
+                    </tr>
+                @else
                 @foreach ($leveringen as $levering)
                     <tr>
                         <td>{{ $levering->Naam }}</td>
@@ -35,6 +43,7 @@
                         </td>
                     </tr>
                 @endforeach
+                @endif
             </tbody>
         </table>
 

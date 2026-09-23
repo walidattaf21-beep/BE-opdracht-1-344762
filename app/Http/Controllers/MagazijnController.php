@@ -43,11 +43,20 @@ class MagazijnController extends Controller
         $leverancier = $this->leverancierModel->getLeverancierByProductId($productId);
         $leveringen  = $this->leverancierModel->getLeveringenByProductId($productId);
 
+        // Scenario_02: geen voorraad van dit product in het magazijn
+        $geenVoorraad = empty($product->AantalAanwezig);
+
+        // De verwachte eerstvolgende levering staat bij de laatste levering
+        $laatsteLevering  = end($leveringen) ?: null;
+        $volgendeLevering = $laatsteLevering?->DatumEerstVolgendeLevering;
+
         return view('magazijn.levering', [
-            'title'       => 'Levering Informatie',
-            'product'     => $product,
-            'leverancier' => $leverancier,
-            'leveringen'  => $leveringen,
+            'title'            => 'Levering Informatie',
+            'product'          => $product,
+            'leverancier'      => $leverancier,
+            'leveringen'       => $leveringen,
+            'geenVoorraad'     => $geenVoorraad,
+            'volgendeLevering' => $volgendeLevering,
         ]);
     }
 }
