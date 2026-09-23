@@ -9,7 +9,7 @@
                 <tr>
                     <th>Barcode</th>
                     <th>Naam</th>
-                    <th>Verpakkingseenheid (kg)</th>
+                    <th>Verpakkingseenheid</th>
                     <th>Aantal aanwezig</th>
                     <th class="center">Allergenen Info</th>
                     <th class="center">Leverantie Info</th>

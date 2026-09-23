@@ -18,7 +18,7 @@
             <div class="jamin-info">
                 <div><span>Naam leverancier:</span> {{ $leverancier->Naam }}</div>
                 <div><span>Contactpersoon leverancier:</span> {{ $leverancier->ContactPersoon }}</div>
-                <div><span>Leveranciernummer:</span> {{ $leverancier->LeverancierNummer }}</div>
+                <div><span>Leverancier nummer:</span> {{ $leverancier->LeverancierNummer }}</div>
                 <div><span>Mobiel:</span> {{ $leverancier->Mobiel }}</div>
             </div>
         @endif

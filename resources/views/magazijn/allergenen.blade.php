@@ -15,7 +15,7 @@
         <h1>{{ $title }}</h1>
 
         <div class="jamin-info">
-            <div><span>Naam Product:</span> {{ $product->Naam }}</div>
+            <div><span>Naam:</span> {{ $product->Naam }}</div>
             <div><span>Barcode:</span> {{ $product->Barcode }}</div>
         </div>
 
