@@ -18,7 +18,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth')->group(function () {
+// Alleen admin en magazijnmedewerker mogen het magazijn zien
+Route::middleware(['auth', 'rol:admin,magazijnmedewerker'])->group(function () {
     Route::get('/magazijn', [MagazijnController::class, 'index'])->name('magazijn.index');
     Route::get('/magazijn/{productId}/levering', [MagazijnController::class, 'levering'])->whereNumber('productId')->name('magazijn.levering');
     Route::get('/magazijn/{productId}/allergenen', [MagazijnController::class, 'allergenen'])->whereNumber('productId')->name('magazijn.allergenen');
