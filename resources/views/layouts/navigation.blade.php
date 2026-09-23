@@ -15,9 +15,16 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*')">
-                        Overzicht Magazijn Jamin
-                    </x-nav-link>
+                    @if (Auth::user()->magMagazijnZien())
+                        <x-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*')">
+                            Overzicht Magazijn Jamin
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()->heeftRol('admin'))
+                        <x-nav-link :href="route('gebruikers.index')" :active="request()->routeIs('gebruikers.*')">
+                            Gebruikers
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -73,9 +80,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*')">
-                Overzicht Magazijn Jamin
-            </x-responsive-nav-link>
+            @if (Auth::user()->magMagazijnZien())
+                <x-responsive-nav-link :href="route('magazijn.index')" :active="request()->routeIs('magazijn.*')">
+                    Overzicht Magazijn Jamin
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()->heeftRol('admin'))
+                <x-responsive-nav-link :href="route('gebruikers.index')" :active="request()->routeIs('gebruikers.*')">
+                    Gebruikers
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

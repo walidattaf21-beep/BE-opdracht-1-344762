@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'rol', 'password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,5 +28,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Controleert of de gebruiker een van de opgegeven rollen heeft.
+     */
+    public function heeftRol(string ...$rollen): bool
+    {
+        return in_array($this->rol, $rollen, true);
+    }
+
+    /**
+     * Mag deze gebruiker het magazijn van Jamin bekijken?
+     */
+    public function magMagazijnZien(): bool
+    {
+        return $this->heeftRol('admin', 'magazijnmedewerker');
     }
 }

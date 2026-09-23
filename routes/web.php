@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GebruikerController;
 use App\Http\Controllers\MagazijnController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -18,10 +19,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware('auth')->group(function () {
+// Alleen admin en magazijnmedewerker mogen het magazijn zien
+Route::middleware(['auth', 'rol:admin,magazijnmedewerker'])->group(function () {
     Route::get('/magazijn', [MagazijnController::class, 'index'])->name('magazijn.index');
     Route::get('/magazijn/{productId}/levering', [MagazijnController::class, 'levering'])->whereNumber('productId')->name('magazijn.levering');
     Route::get('/magazijn/{productId}/allergenen', [MagazijnController::class, 'allergenen'])->whereNumber('productId')->name('magazijn.allergenen');
+});
+
+// Alleen admin mag het gebruikersoverzicht zien
+Route::middleware(['auth', 'rol:admin'])->group(function () {
+    Route::get('/gebruikers', [GebruikerController::class, 'index'])->name('gebruikers.index');
 });
 
 require __DIR__.'/auth.php';
