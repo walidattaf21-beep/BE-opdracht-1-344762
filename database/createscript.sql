@@ -1,3 +1,18 @@
+-- ***************************************************************
+-- Createscript Jamin magazijn
+-- Opdracht 1 - Realiseren userstories
+-- ***************************************************************
+
+CREATE DATABASE IF NOT EXISTS jamin;
+USE jamin;
+
+DROP TABLE IF EXISTS ProductPerLeverancier;
+DROP TABLE IF EXISTS ProductPerAllergeen;
+DROP TABLE IF EXISTS Magazijn;
+DROP TABLE IF EXISTS Leverancier;
+DROP TABLE IF EXISTS Allergeen;
+DROP TABLE IF EXISTS Product;
+
 -- Stamtabellen
 
 CREATE TABLE Product (
