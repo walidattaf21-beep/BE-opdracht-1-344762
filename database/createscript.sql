@@ -1,11 +1,18 @@
--- ***************************************************************
--- Createscript Jamin magazijn
--- Opdracht 1 - Realiseren userstories
--- ***************************************************************
-
+-- ******************************************************************************
+-- Step: 01
+-- Goal: Maak de database jamin aan (als die nog niet bestaat)
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+-- Let op: geen DROP DATABASE, want Laravel zet de tabellen users en sessions ook in jamin
 CREATE DATABASE IF NOT EXISTS jamin;
+
+-- Gebruik database jamin
 USE jamin;
 
+-- Verwijder bestaande tabellen (koppeltabellen eerst vanwege de foreign keys)
 DROP TABLE IF EXISTS ProductPerLeverancier;
 DROP TABLE IF EXISTS ProductPerAllergeen;
 DROP TABLE IF EXISTS Magazijn;
@@ -13,86 +20,44 @@ DROP TABLE IF EXISTS Leverancier;
 DROP TABLE IF EXISTS Allergeen;
 DROP TABLE IF EXISTS Product;
 
--- Stamtabellen
-
-CREATE TABLE Product (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Naam VARCHAR(100) NOT NULL,
-    Barcode VARCHAR(20) NOT NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL
+-- ******************************************************************************
+-- Step: 02
+-- Goal: Maak de tabel Product aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS Product
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,Naam                            VARCHAR(100)                NOT NULL
+    ,Barcode                         VARCHAR(13)                 NOT NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_Product_Id PRIMARY KEY CLUSTERED(Id)
 ) ENGINE=InnoDB;
 
-CREATE TABLE Allergeen (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Naam VARCHAR(50) NOT NULL,
-    Omschrijving VARCHAR(250) NOT NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL
-) ENGINE=InnoDB;
-
-CREATE TABLE Leverancier (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    Naam VARCHAR(100) NOT NULL,
-    ContactPersoon VARCHAR(100) NOT NULL,
-    LeverancierNummer VARCHAR(20) NOT NULL,
-    Mobiel VARCHAR(15) NOT NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL
-) ENGINE=InnoDB;
-
--- Koppeltabellen
-
-CREATE TABLE Magazijn (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    ProductId INT NOT NULL,
-    VerpakkingsEenheidInKilogram DECIMAL(5,2) NOT NULL,
-    AantalAanwezig INT NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL,
-    FOREIGN KEY (ProductId) REFERENCES Product(Id)
-) ENGINE=InnoDB;
-
-CREATE TABLE ProductPerAllergeen (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    ProductId INT NOT NULL,
-    AllergeenId INT NOT NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL,
-    FOREIGN KEY (ProductId) REFERENCES Product(Id),
-    FOREIGN KEY (AllergeenId) REFERENCES Allergeen(Id)
-) ENGINE=InnoDB;
-
-CREATE TABLE ProductPerLeverancier (
-    Id INT AUTO_INCREMENT PRIMARY KEY,
-    LeverancierId INT NOT NULL,
-    ProductId INT NOT NULL,
-    DatumLevering DATE NOT NULL,
-    Aantal INT NOT NULL,
-    DatumEerstVolgendeLevering DATE NULL,
-    IsActief BIT NOT NULL DEFAULT 1,
-    Opmerking VARCHAR(250) NULL,
-    DatumAangemaakt DATETIME(6) NOT NULL,
-    DatumGewijzigd DATETIME(6) NOT NULL,
-    FOREIGN KEY (LeverancierId) REFERENCES Leverancier(Id),
-    FOREIGN KEY (ProductId) REFERENCES Product(Id)
-) ENGINE=InnoDB;
-
--- ***************************************************************
--- Testdata
--- ***************************************************************
-
-INSERT INTO Product (Naam, Barcode, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 03
+-- Goal: Vul de tabel Product met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO Product
+(
+     Naam
+    ,Barcode
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  ('Mintnopjes',     '8719587231278', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Schoolkrijt',    '8719587326713', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Honingdrop',     '8719587327836', 1, NULL, SYSDATE(6), SYSDATE(6))
@@ -107,21 +72,139 @@ INSERT INTO Product (Naam, Barcode, IsActief, Opmerking, DatumAangemaakt, DatumG
 ,('Kruis Drop',     '8719587322265', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Zoute Ruitjes',  '8719587323256', 1, NULL, SYSDATE(6), SYSDATE(6));
 
-INSERT INTO Allergeen (Naam, Omschrijving, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 04
+-- Goal: Maak de tabel Allergeen aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS Allergeen
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,Naam                            VARCHAR(50)                 NOT NULL
+    ,Omschrijving                    VARCHAR(250)                NOT NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_Allergeen_Id PRIMARY KEY CLUSTERED(Id)
+) ENGINE=InnoDB;
+
+-- ******************************************************************************
+-- Step: 05
+-- Goal: Vul de tabel Allergeen met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO Allergeen
+(
+     Naam
+    ,Omschrijving
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  ('Gluten',        'Dit product bevat gluten',          1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Gelatine',      'Dit product bevat gelatine',        1, NULL, SYSDATE(6), SYSDATE(6))
 ,('AZO-Kleurstof', 'Dit product bevat AZO-kleurstoffen', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Lactose',       'Dit product bevat lactose',         1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Soja',          'Dit product bevat soja',            1, NULL, SYSDATE(6), SYSDATE(6));
 
-INSERT INTO Leverancier (Naam, ContactPersoon, LeverancierNummer, Mobiel, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 06
+-- Goal: Maak de tabel Leverancier aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS Leverancier
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,Naam                            VARCHAR(100)                NOT NULL
+    ,ContactPersoon                  VARCHAR(100)                NOT NULL
+    ,LeverancierNummer               VARCHAR(20)                 NOT NULL
+    ,Mobiel                          VARCHAR(12)                 NOT NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_Leverancier_Id PRIMARY KEY CLUSTERED(Id)
+) ENGINE=InnoDB;
+
+-- ******************************************************************************
+-- Step: 07
+-- Goal: Vul de tabel Leverancier met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO Leverancier
+(
+     Naam
+    ,ContactPersoon
+    ,LeverancierNummer
+    ,Mobiel
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  ('Venco',       'Bert van Linge',     'L1029384719', '06-28493827', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Astra Sweets','Jasper del Monte',   'L1029284315', '06-39398734', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Haribo',      'Sven Stalman',       'L1029324748', '06-24383291', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('Basset',      'Joyce Stelterberg',  'L1023845773', '06-48293823', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,('De Bron',     'Remco Veenstra',     'L1023857736', '06-34291234', 1, NULL, SYSDATE(6), SYSDATE(6));
 
-INSERT INTO Magazijn (ProductId, VerpakkingsEenheidInKilogram, AantalAanwezig, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 08
+-- Goal: Maak de tabel Magazijn aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS Magazijn
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,ProductId                       TINYINT         UNSIGNED    NOT NULL
+    ,VerpakkingsEenheidInKilogram    DECIMAL(4,1)                NOT NULL
+    ,AantalAanwezig                  SMALLINT        UNSIGNED        NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_Magazijn_Id PRIMARY KEY CLUSTERED(Id)
+    ,CONSTRAINT FK_Magazijn_ProductId_Product_Id FOREIGN KEY (ProductId) REFERENCES Product(Id)
+) ENGINE=InnoDB;
+
+-- ******************************************************************************
+-- Step: 09
+-- Goal: Vul de tabel Magazijn met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO Magazijn
+(
+     ProductId
+    ,VerpakkingsEenheidInKilogram
+    ,AantalAanwezig
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  (1,  5,   453,  1, NULL, SYSDATE(6), SYSDATE(6))
 ,(2,  2.5, 400,  1, NULL, SYSDATE(6), SYSDATE(6))
 ,(3,  5,   1,    1, NULL, SYSDATE(6), SYSDATE(6))
@@ -136,7 +219,46 @@ INSERT INTO Magazijn (ProductId, VerpakkingsEenheidInKilogram, AantalAanwezig, I
 ,(12, 1,   467,  1, NULL, SYSDATE(6), SYSDATE(6))
 ,(13, 5,   20,   1, NULL, SYSDATE(6), SYSDATE(6));
 
-INSERT INTO ProductPerAllergeen (ProductId, AllergeenId, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 10
+-- Goal: Maak de tabel ProductPerAllergeen aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS ProductPerAllergeen
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,ProductId                       TINYINT         UNSIGNED    NOT NULL
+    ,AllergeenId                     TINYINT         UNSIGNED    NOT NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_ProductPerAllergeen_Id PRIMARY KEY CLUSTERED(Id)
+    ,CONSTRAINT FK_ProductPerAllergeen_ProductId_Product_Id FOREIGN KEY (ProductId) REFERENCES Product(Id)
+    ,CONSTRAINT FK_ProductPerAllergeen_AllergeenId_Allergeen_Id FOREIGN KEY (AllergeenId) REFERENCES Allergeen(Id)
+) ENGINE=InnoDB;
+
+-- ******************************************************************************
+-- Step: 11
+-- Goal: Vul de tabel ProductPerAllergeen met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO ProductPerAllergeen
+(
+     ProductId
+    ,AllergeenId
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  (1,  2, 1, NULL, SYSDATE(6), SYSDATE(6))
 ,(1,  1, 1, NULL, SYSDATE(6), SYSDATE(6))
 ,(1,  3, 1, NULL, SYSDATE(6), SYSDATE(6))
@@ -150,7 +272,52 @@ INSERT INTO ProductPerAllergeen (ProductId, AllergeenId, IsActief, Opmerking, Da
 ,(13, 4, 1, NULL, SYSDATE(6), SYSDATE(6))
 ,(13, 5, 1, NULL, SYSDATE(6), SYSDATE(6));
 
-INSERT INTO ProductPerLeverancier (LeverancierId, ProductId, DatumLevering, Aantal, DatumEerstVolgendeLevering, IsActief, Opmerking, DatumAangemaakt, DatumGewijzigd) VALUES
+-- ******************************************************************************
+-- Step: 12
+-- Goal: Maak de tabel ProductPerLeverancier aan
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+CREATE TABLE IF NOT EXISTS ProductPerLeverancier
+(
+     Id                              TINYINT         UNSIGNED    NOT NULL    AUTO_INCREMENT
+    ,LeverancierId                   TINYINT         UNSIGNED    NOT NULL
+    ,ProductId                       TINYINT         UNSIGNED    NOT NULL
+    ,DatumLevering                   DATE                        NOT NULL
+    ,Aantal                          SMALLINT        UNSIGNED    NOT NULL
+    ,DatumEerstVolgendeLevering      DATE                            NULL
+    ,IsActief                        BIT                         NOT NULL    DEFAULT 1
+    ,Opmerking                       VARCHAR(250)                    NULL    DEFAULT NULL
+    ,DatumAangemaakt                 DATETIME(6)                 NOT NULL
+    ,DatumGewijzigd                  DATETIME(6)                 NOT NULL
+    ,CONSTRAINT PK_ProductPerLeverancier_Id PRIMARY KEY CLUSTERED(Id)
+    ,CONSTRAINT FK_ProductPerLeverancier_LeverancierId_Leverancier_Id FOREIGN KEY (LeverancierId) REFERENCES Leverancier(Id)
+    ,CONSTRAINT FK_ProductPerLeverancier_ProductId_Product_Id FOREIGN KEY (ProductId) REFERENCES Product(Id)
+) ENGINE=InnoDB;
+
+-- ******************************************************************************
+-- Step: 13
+-- Goal: Vul de tabel ProductPerLeverancier met data
+-- ******************************************************************************
+-- Version   Date         Author    Description
+-- *******   **********   ******    ******************
+-- 01        23-09-2026   Walid     New
+-- ******************************************************************************
+INSERT INTO ProductPerLeverancier
+(
+     LeverancierId
+    ,ProductId
+    ,DatumLevering
+    ,Aantal
+    ,DatumEerstVolgendeLevering
+    ,IsActief
+    ,Opmerking
+    ,DatumAangemaakt
+    ,DatumGewijzigd
+)
+VALUES
  (1, 1,  '2024-10-09', 23, '2024-10-16', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,(1, 1,  '2024-10-18', 21, '2024-10-25', 1, NULL, SYSDATE(6), SYSDATE(6))
 ,(1, 2,  '2024-10-09', 12, '2024-10-16', 1, NULL, SYSDATE(6), SYSDATE(6))
