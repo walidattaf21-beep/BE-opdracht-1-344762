@@ -11,6 +11,7 @@
                     <th>Naam</th>
                     <th>Verpakkingseenheid (kg)</th>
                     <th>Aantal aanwezig</th>
+                    <th class="center">Allergenen Info</th>
                     <th class="center">Leverantie Info</th>
                 </tr>
             </thead>
@@ -22,12 +23,15 @@
                         <td>{{ $product->VerpakkingsEenheidInKilogram }}</td>
                         <td>{{ $product->AantalAanwezig ?? 0 }}</td>
                         <td class="center">
+                            <a href="{{ route('magazijn.allergenen', $product->ProductId) }}" class="icon-kruis" title="Allergenen info">&#10006;</a>
+                        </td>
+                        <td class="center">
                             <a href="{{ route('magazijn.levering', $product->ProductId) }}" class="icon-vraag" title="Leverantie info">?</a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="jamin-melding">Er staan geen producten in het magazijn</td>
+                        <td colspan="6" class="jamin-melding">Er staan geen producten in het magazijn</td>
                     </tr>
                 @endforelse
             </tbody>
