@@ -17,12 +17,18 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($allergenen as $allergeen)
+                @forelse ($allergenen as $allergeen)
                     <tr>
                         <td>{{ $allergeen->Naam }}</td>
                         <td>{{ $allergeen->Omschrijving }}</td>
                     </tr>
-                @endforeach
+                @empty
+                    <tr>
+                        <td colspan="2" class="jamin-melding">
+                            In dit product zitten geen stoffen die een allergische reactie kunnen veroorzaken
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
 
