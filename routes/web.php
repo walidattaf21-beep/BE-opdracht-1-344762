@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/magazijn', [MagazijnController::class, 'index'])->name('magazijn.index');
     Route::get('/magazijn/{productId}/levering', [MagazijnController::class, 'levering'])->whereNumber('productId')->name('magazijn.levering');
+    Route::get('/magazijn/{productId}/allergenen', [MagazijnController::class, 'allergenen'])->whereNumber('productId')->name('magazijn.allergenen');
 });
 
 require __DIR__.'/auth.php';

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Allergeen;
 use App\Models\Leverancier;
 use App\Models\Magazijn;
 
@@ -9,11 +10,13 @@ class MagazijnController extends Controller
 {
     private Magazijn $magazijnModel;
     private Leverancier $leverancierModel;
+    private Allergeen $allergeenModel;
 
     public function __construct()
     {
         $this->magazijnModel = new Magazijn();
         $this->leverancierModel = new Leverancier();
+        $this->allergeenModel = new Allergeen();
     }
 
     /**
@@ -57,6 +60,26 @@ class MagazijnController extends Controller
             'leveringen'       => $leveringen,
             'geenVoorraad'     => $geenVoorraad,
             'volgendeLevering' => $volgendeLevering,
+        ]);
+    }
+
+    /**
+     * Detailscherm Overzicht Allergenen van een product
+     */
+    public function allergenen(int $productId)
+    {
+        $product = $this->magazijnModel->getByProductId($productId);
+
+        if ($product === null) {
+            return redirect()->route('magazijn.index');
+        }
+
+        $allergenen = $this->allergeenModel->getAllergenenByProductId($productId);
+
+        return view('magazijn.allergenen', [
+            'title'      => 'Overzicht Allergenen',
+            'product'    => $product,
+            'allergenen' => $allergenen,
         ]);
     }
 }
