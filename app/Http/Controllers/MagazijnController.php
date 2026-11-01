@@ -2,84 +2,94 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Allergeen;
-use App\Models\Leverancier;
 use App\Models\Magazijn;
+use App\Models\Product;
+use App\Models\ProductPerLeverancier;
+use App\Models\ProductPerAllergeen;
+use Illuminate\Http\Request;
 
 class MagazijnController extends Controller
 {
-    private Magazijn $magazijnModel;
-    private Leverancier $leverancierModel;
-    private Allergeen $allergeenModel;
-
-    public function __construct()
-    {
-        $this->magazijnModel = new Magazijn();
-        $this->leverancierModel = new Leverancier();
-        $this->allergeenModel = new Allergeen();
-    }
-
     /**
-     * Scherm Overzicht Magazijn Jamin
+     * Toon het overzicht van alle producten in het magazijn.
+     * Producten zijn gesorteerd op Barcode oplopend.
      */
     public function index()
     {
-        $producten = $this->magazijnModel->getOverzicht();
+        $magazijnItems = Magazijn::with('product')
+            ->join('Product', 'Magazijn.ProductId', '=', 'Product.Id')
+            ->orderBy('Product.Barcode', 'asc')
+            ->select('Magazijn.*')
+            ->get();
 
-        return view('magazijn.index', [
-            'title'     => 'Overzicht Magazijn Jamin',
-            'producten' => $producten,
-        ]);
+        return view('magazijn.index', ['magazijnItems' => $magazijnItems, 'producten' => $magazijnItems, 'title' => 'Magazijnoverzicht']);
     }
 
     /**
-     * Detailscherm Levering Informatie van een product
+     * Toon de leveringsinformatie van een product.
+     * User Story 01 - Scenario 01 & 02
      */
-    public function levering(int $productId)
+    public function leveringInfo($productId)
     {
-        $product = $this->magazijnModel->getByProductId($productId);
+        $product = Product::findOrFail($productId);
 
-        if ($product === null) {
-            return redirect()->route('magazijn.index');
+        // Haal het magazijn-record op voor dit product
+        $magazijn = Magazijn::where('ProductId', $productId)->first();
+
+        // Haal alle leveringen op voor dit product, gesorteerd op DatumLevering oplopend
+        $leveringen = ProductPerLeverancier::with('leverancier')
+            ->where('ProductId', $productId)
+            ->orderBy('DatumLevering', 'asc')
+            ->get();
+
+        // Haal de leverancier informatie op (eerste leverancier die dit product levert)
+        $leverancierInfo = null;
+        if ($leveringen->isNotEmpty()) {
+            $leverancierInfo = $leveringen->first()->leverancier;
         }
 
-        $leverancier = $this->leverancierModel->getLeverancierByProductId($productId);
-        $leveringen  = $this->leverancierModel->getLeveringenByProductId($productId);
+        // Scenario 02: Controleer of het product op voorraad is (AantalAanwezig is NULL)
+        $geenVoorraad = ($magazijn && $magazijn->AantalAanwezig === null);
 
-        // Scenario_02: geen voorraad van dit product in het magazijn
-        $geenVoorraad = empty($product->AantalAanwezig);
+        // Haal de verwachte eerstvolgende levering op voor het bericht
+        $verwachteLevering = null;
+        if ($geenVoorraad && $leveringen->isNotEmpty()) {
+            $laatsteLevering = $leveringen->last();
+            $verwachteLevering = $laatsteLevering->DatumEerstVolgendeLevering;
+        }
 
-        // De verwachte eerstvolgende levering staat bij de laatste levering
-        $laatsteLevering  = end($leveringen) ?: null;
-        $volgendeLevering = $laatsteLevering?->DatumEerstVolgendeLevering;
-
-        return view('magazijn.levering', [
-            'title'            => 'Levering Informatie',
-            'product'          => $product,
-            'leverancier'      => $leverancier,
-            'leveringen'       => $leveringen,
-            'geenVoorraad'     => $geenVoorraad,
-            'volgendeLevering' => $volgendeLevering,
-        ]);
+        return view('magazijn.levering-info', compact(
+            'product',
+            'leveringen',
+            'leverancierInfo',
+            'geenVoorraad',
+            'verwachteLevering'
+        ));
     }
 
     /**
-     * Detailscherm Overzicht Allergenen van een product
+     * Toon de allergeneninformatie van een product.
+     * User Story 02 - Scenario 01 & 02
      */
-    public function allergenen(int $productId)
+    public function allergenenInfo($productId)
     {
-        $product = $this->magazijnModel->getByProductId($productId);
+        $product = Product::findOrFail($productId);
 
-        if ($product === null) {
-            return redirect()->route('magazijn.index');
-        }
+        // Haal alle allergenen op voor dit product, gesorteerd op Naam oplopend
+        $allergenen = ProductPerAllergeen::with('allergeen')
+            ->where('ProductId', $productId)
+            ->join('Allergeen', 'ProductPerAllergeen.AllergeenId', '=', 'Allergeen.Id')
+            ->orderBy('Allergeen.Naam', 'asc')
+            ->select('ProductPerAllergeen.*')
+            ->get();
 
-        $allergenen = $this->allergeenModel->getAllergenenByProductId($productId);
+        // Scenario 02: Controleer of er geen allergenen zijn
+        $geenAllergenen = $allergenen->isEmpty();
 
-        return view('magazijn.allergenen', [
-            'title'      => 'Overzicht Allergenen',
-            'product'    => $product,
-            'allergenen' => $allergenen,
-        ]);
+        return view('magazijn.allergenen-info', compact(
+            'product',
+            'allergenen',
+            'geenAllergenen'
+        ));
     }
 }

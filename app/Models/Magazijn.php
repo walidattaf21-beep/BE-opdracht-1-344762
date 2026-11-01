@@ -2,46 +2,43 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
-class Magazijn
+class Magazijn extends Model
 {
     /**
-     * Haalt alle producten op die in het magazijn staan,
-     * gesorteerd op barcode oplopend.
+     * De tabel die bij dit model hoort.
      */
-    public function getOverzicht(): array
-    {
-        $sql = 'SELECT  PROD.Id AS ProductId
-                       ,PROD.Naam
-                       ,PROD.Barcode
-                       ,MAGA.VerpakkingsEenheidInKilogram
-                       ,MAGA.AantalAanwezig
-                FROM    Magazijn AS MAGA
-                INNER JOIN Product AS PROD
-                        ON PROD.Id = MAGA.ProductId
-                WHERE   MAGA.IsActief = 1
-                ORDER BY PROD.Barcode ASC';
-
-        return DB::select($sql);
-    }
+    protected $table = 'Magazijn';
 
     /**
-     * Haalt één product uit het magazijn op, inclusief aantal aanwezig.
+     * De primary key van de tabel.
      */
-    public function getByProductId(int $productId): ?object
+    protected $primaryKey = 'Id';
+
+    /**
+     * Timestamps worden niet automatisch beheerd door Laravel.
+     */
+    public $timestamps = false;
+
+    /**
+     * De velden die mass-assignable zijn.
+     */
+    protected $fillable = [
+        'ProductId',
+        'VerpakkingsEenheidInKilogram',
+        'AantalAanwezig',
+        'IsActief',
+        'Opmerking',
+        'DatumAangemaakt',
+        'DatumGewijzigd',
+    ];
+
+    /**
+     * Relatie: Een magazijn-record hoort bij Ã©Ã©n product.
+     */
+    public function product()
     {
-        $sql = 'SELECT  PROD.Id AS ProductId
-                       ,PROD.Naam
-                       ,PROD.Barcode
-                       ,MAGA.AantalAanwezig
-                FROM    Magazijn AS MAGA
-                INNER JOIN Product AS PROD
-                        ON PROD.Id = MAGA.ProductId
-                WHERE   PROD.Id = :productId';
-
-        $result = DB::select($sql, ['productId' => $productId]);
-
-        return $result[0] ?? null;
+        return $this->belongsTo(Product::class, 'ProductId', 'Id');
     }
 }

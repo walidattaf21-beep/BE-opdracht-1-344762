@@ -2,24 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
 
-class Allergeen
+class Allergeen extends Model
 {
     /**
-     * Haalt alle allergenen van het gekozen product op,
-     * gesorteerd op naam oplopend.
+     * De tabel die bij dit model hoort.
      */
-    public function getAllergenenByProductId(int $productId): array
-    {
-        $sql = 'SELECT  ALLE.Naam
-                       ,ALLE.Omschrijving
-                FROM    ProductPerAllergeen AS PPAL
-                INNER JOIN Allergeen AS ALLE
-                        ON ALLE.Id = PPAL.AllergeenId
-                WHERE   PPAL.ProductId = :productId
-                ORDER BY ALLE.Naam ASC';
+    protected $table = 'Allergeen';
 
-        return DB::select($sql, ['productId' => $productId]);
+    /**
+     * De primary key van de tabel.
+     */
+    protected $primaryKey = 'Id';
+
+    /**
+     * Timestamps worden niet automatisch beheerd door Laravel.
+     */
+    public $timestamps = false;
+
+    /**
+     * De velden die mass-assignable zijn.
+     */
+    protected $fillable = [
+        'Naam',
+        'Omschrijving',
+        'IsActief',
+        'Opmerking',
+        'DatumAangemaakt',
+        'DatumGewijzigd',
+    ];
+
+    /**
+     * Relatie: Een allergeen heeft meerdere product-koppelingen.
+     */
+    public function productPerAllergenen()
+    {
+        return $this->hasMany(ProductPerAllergeen::class, 'AllergeenId', 'Id');
     }
 }
